@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Label item data</title>
+    <style>
+        .bzItem {
+            font-family:sans-serif;
+            font-size:1vw;
+            cursor: pointer;
+            margin-bottom:.4vh;
+        }
+        .bzItem:hover {
+            background-color: rgb(178, 185, 192);
+        }
+
+        .bzItemSelected {
+            font-size:1.5vw;
+        }
+
+        .bzItemSelected:hover {
+            background-color: rgb(168, 34, 34) !important;
+        }
+    </style>
+</head>
+<body style="margin-left:3vw;margin-top:4vh;">
+    <div id="content">
+        <div id="amountRemaining" style="font-size:1.3vw;font-family:sans-serif;"></div>
+        <div id="itemName" style="font-size:4vw;font-family:sans-serif;display:inline-block;cursor:pointer;" onclick="copyName()"></div>
+        <button id="craftableButton" style="font-size:1.5vw;margin-left:4vw;cursor:pointer;" onclick="sendData(false)">Not Craftable using items on bazaar.</button><br>
+        <input type="text" id="resourceInput" style="font-size:1.5vw;margin-top:7vh;" placeholder="enter material name" oninput="updateMaterialContainer()">
+        <input type="number" id="resourceAmount" style="font-size:1.5vw;margin-top:7vh;width:15vw;" placeholder="amount">
+        <button style="font-size:1.5vw;margin-left:40vw;cursor:pointer;" onclick="sendData(true)">submit</button><br>
+        <div id="materialNameContainer" style="width:40vw;height:70vh;background-color: aliceblue;overflow-y: auto;display:inline-block;"></div>
+        <div id="materialsContainer" style="width:40vw;height:70vh;background-color: rgb(189, 211, 226);overflow-y: auto;display:inline-block;"></div>
+        <form method="post" action="./submitMats" style="display:none;">
+            <input type="text" id="formInput" name="formInput">
+            <input type="submit" id="formSubmitButton">
+        </form>
+    </div>
+    <script>
+        let bzKeys;
+        let itemName;
+        let materialList = [];
+        let itemIndex;
+        if(window.location.pathname !== "/") window.location.pathname = "/";
+        else loadItem();
+        function loadItem() {
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", "./getItem", false);
+            xhr.send();
+            const itemData = JSON.parse(xhr.responseText);
+            if(itemData.remaining == 0) return document.getElementById("content").innerHTML = "FINISHED LABELING!!!";
+            document.getElementById("itemName").innerText = itemData.name;
+            document.getElementById("amountRemaining").innerText = itemData.remaining + " items remaining";
+            bzKeys = itemData.bzKeys;
+            itemName = itemData.name;
+            itemIndex = itemData.index;
+        }
+        
+
+        function updateMaterialContainer() {
+            const search = document.getElementById("resourceInput").value.replace(/ /g, "_");
+            const container = document.getElementById("materialNameContainer");
+            if(search.length == 0) return container.innerHTML = "";
+            const matches = [];
+            for(let i=0;i<bzKeys.length;i++) if(bzKeys[i].toLowerCase().includes(search) && !materialList.map(e=>e.name).includes(bzKeys[i]) && matches.length<100) matches.push(bzKeys[i]);
+            let str = "";
+            for(let i=0;i<matches.length;i++) str+=`<div class="bzItem" onclick="addMaterial('${matches[i]}')"">${matches[i].replace(/_/g, " ")}</div>`;
+            container.innerHTML = str;
+        }
+
+        function addMaterial(materialName) {
+            const amount = Number(document.getElementById("resourceAmount").value)
+            materialList.push({name:materialName, amount:amount});
+            document.getElementById("materialNameContainer").innerHTML = "";
+            document.getElementById("resourceInput").value = "";
+            document.getElementById("resourceAmount").value = "";
+            document.getElementById("materialsContainer").innerHTML += `<div class="bzItem bzItemSelected" onclick="removeMaterial(${materialList.length-1}, this)">${materialName.replace(/_/g, " ")} <strong>x</strong> ${amount}</div>`;
+        }
+
+        function removeMaterial(index, e) {
+            materialList.splice(index, 1);
+            e.remove();
+        }
+
+        function sendData(craftable) {
+            if(itemIndex == undefined) return;
+            document.getElementById("formInput").value = JSON.stringify({craftable:craftable,materials:materialList,itemIndex:itemIndex,name:itemName});
+            document.getElementById("formSubmitButton").click();
+        }
+
+        function copyName() {
+            unsecuredCopyToClipboard(itemName);
+        }
+        function unsecuredCopyToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.error('Unable to copy to clipboard', err);
+            }
+            document.body.removeChild(textArea);
+        }
+    </script>
+</body>
+</html>
