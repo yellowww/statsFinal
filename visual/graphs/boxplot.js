@@ -147,12 +147,10 @@ function drawKey(ctx,dimentions, color0, color1, text0, text1) {
 
 function numberSummery(ctx, dimentions, data, color,roundingRule) {
     let text  = "";
-    const withoutOutliers = data//seperateOutliers(data)[0];
+    const withoutOutliers = seperateOutliers(data)[0];
     const percentiles = [[0,"min"],[0.25, "q1"], [0.5, "median"], [0.75, "q3"], [1, "max"]];
     for(let i=0;i<percentiles.length;i++) {
-        if(i==0) text += "min: "+ numberWithCommas(Math.round(Math.min(...data)/roundingRule[0]));
-        else if(i==percentiles.length-1) text += "max: "+ numberWithCommas(Math.round(Math.max(...data)/roundingRule[0]));
-        else text += percentiles[i][1] +": "+numberWithCommas(Math.round(fromPercentiles(withoutOutliers,percentiles[i][0])/roundingRule[0]));
+        text += percentiles[i][1] +": "+numberWithCommas(Math.round(fromPercentiles(withoutOutliers,percentiles[i][0])/roundingRule[0]));
         if(i!==percentiles.length-1) text += ", ";
     }
     ctx.fillStyle = color;

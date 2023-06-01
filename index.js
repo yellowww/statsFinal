@@ -21,6 +21,6 @@ const testWriteup = require("./visual/testWriteup.js");
 
 
 
-const index = 45
+const index = 8
 generateDistributions(index)
 testWriteup(index)

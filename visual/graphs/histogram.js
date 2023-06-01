@@ -46,6 +46,11 @@ function generateHistogram(ctx, dataset, bars, dimentions, roundingRule, title, 
         barHeights.push(frequency);
         barBounteries.push([barMin,barMax]);
     }
+    if(bars > 1) {
+        let only1Bar = true;
+        for(let i=1;i<bars;i++) if(barHeights[i]>0) only1Bar = false;
+        if(only1Bar) return generateHistogram(ctx, dataset, 1, dimentions, roundingRule, title, xLabel);
+    }
 
     //bars
     const maxBarHeight = Math.max(...barHeights);
@@ -102,13 +107,13 @@ function generateHistogram(ctx, dataset, bars, dimentions, roundingRule, title, 
         const text = `${numberWithCommas(Math.round(barBounteries[i][0]/roundingRule[0])+(i==0?0:1))} - ${numberWithCommas(Math.round(barBounteries[i][1]/roundingRule[0]))}`;
         ctx.fillText(text, 0, 0);
         ctx.restore();
-        if(i==bars-1) maxPriceLength = ctx.measureText(text).width;
+        if(i==Math.ceil(bars/2)) maxPriceLength = ctx.measureText(text).width;
     }
 
     // x axis label
     ctx.textAlign = "center";
     ctx.font = `30px sans-serif`;
-    ctx.fillText(xLabel+" ("+roundingRule[1]+")", dimentions[0]+dimentions[2]/2, dimentions[1]+dimentions[3]+maxPriceLength+40);
+    ctx.fillText(xLabel+" ("+roundingRule[1]+")", dimentions[0]+dimentions[2]/2, dimentions[1]+dimentions[3]+maxPriceLength+50);
 
     //title
     ctx.font = `40px sans-serif`;

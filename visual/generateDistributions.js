@@ -21,15 +21,14 @@ function getRoundingRule(data) {
     for(let i=state.length-1;i>=0;i--) {
         if(state[i]) return [places[i], names[i]];
     }
+    return [1, "coins"];
 }
 
 function generateDistributionPage(index) {
     const sellPrices = formated[keys[index]].sellPrice, craftCosts = formated[keys[index]].craftCost;
     const histogramRoundingRule = getRoundingRule([...sellPrices, ...craftCosts]);
-    
     const canvas = createCanvas(1700,2200);
     const ctx = canvas.getContext('2d');
-
 
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -45,8 +44,8 @@ function generateDistributionPage(index) {
     ctx.lineTo(ctx.measureText(`Selling prices and material costs of ${titleConnector} `+ keys[index]).width+40,90)
     ctx.stroke();
 
-    histogram(ctx, boxplot.seperateOutliers(sellPrices)[0], 12, [150,230,600,400], histogramRoundingRule, "Sell price distribution (outliers not shown)", "Sell price");
-    histogram(ctx, boxplot.seperateOutliers(craftCosts)[0], 12, [150,960,600,400], histogramRoundingRule, "Material cost distribution (outliers not shown)", "Material cost");
+    histogram(ctx, boxplot.seperateOutliers(sellPrices)[0], 12, [150,230,600,400], histogramRoundingRule, "Sell price distribution (outliers omitted)", "Sell price");
+    histogram(ctx, boxplot.seperateOutliers(craftCosts)[0], 12, [150,960,600,400], histogramRoundingRule, "Material cost distribution (outliers omitted)", "Material cost");
 
     const boxplotValueDimentions = boxplot.getValueDimentions(sellPrices, craftCosts, true);
     boxplot.draw(ctx, sellPrices,[150,1690,600,80],true,"rgb(0,0,100)", boxplotValueDimentions);
@@ -56,8 +55,8 @@ function generateDistributionPage(index) {
     boxplot.draw(ctx, sellPrices,[950,1690,600,80],false,"rgb(0,0,100)", boxplotValueDimentionsOutliers);
     boxplot.draw(ctx, craftCosts,[950,1780,600,80],false,"rgb(100,0,0)", boxplotValueDimentionsOutliers);
 
-    boxplot.drawDesc(ctx,"Price and cost distributions (outliers not shown)", [150,1690,600,170], histogramRoundingRule, boxplotValueDimentions);
-    boxplot.drawDesc(ctx,"Price and cost distributions (outliers shown)", [950,1690,600,170], histogramRoundingRule, boxplotValueDimentionsOutliers)
+    boxplot.drawDesc(ctx,"Price and cost distributions (outliers omitted)", [150,1690,600,170], histogramRoundingRule, boxplotValueDimentions);
+    boxplot.drawDesc(ctx,"Price and cost distributions (outliers included)", [950,1690,600,170], histogramRoundingRule, boxplotValueDimentionsOutliers)
 
     boxplot.drawKey(ctx, [150, 2065], "rgb(0,0,100)", "rgb(100,0,0)", "Sell Price", "Material Cost");
 

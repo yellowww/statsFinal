@@ -11,11 +11,24 @@ function generateTestWriteup(index) {
     const canvas = createCanvas(1700,2200);
     const ctx = canvas.getContext('2d');
     const data = formated[keys[index]];
+    data.sellPrice = boxplot.seperateOutliers(data.sellPrice)[0];
+    data.craftCost = boxplot.seperateOutliers(data.craftCost)[0];
 
     const test = new DiffMeanTest(data.sellPrice, data.craftCost, 0.95);
 
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.textAlign = "left";
+    ctx.font = `45px sans-serif`;
+    ctx.fillStyle = "black";
+    const titleConnector = ["a","e","i","o","u"].includes(keys[index].toLowerCase()[0])?"an":"a";
+    ctx.fillText(`Statistical test comparing the selling prices and material costs of \n${titleConnector} `+ keys[index],40,80);
+    ctx.beginPath();
+    ctx.lineWidth = 4;
+    ctx.moveTo(ctx.measureText(`${titleConnector} `).width+40,140);
+    ctx.lineTo(ctx.measureText(`${titleConnector} `+ keys[index]).width+40,140)
+    ctx.stroke();
 
     drawLetStatments(ctx, getName(index));
     drawRequirements(ctx, data,test);
@@ -36,10 +49,10 @@ function drawLetStatments(ctx, name) {
     ctx.font = `31px sans-serif`;
     ctx.fillStyle = "black";
     ctx.fillText(`Let group1 = Sell prices of ${name},  group2 = Material cost of ${name}`,50,200);
-    ctx.fillText(`X₁ = Sell price of a ${name} (coins),  X₂ = Material cost of a ${name} (coins)`,50, 245);
-    const text = `μ₁ = Mean sell price of a ${name} (coins),  μ₂ = Mean material cost of a ${name} (coins)`;
+    ctx.fillText(`X₁ = Sell price of ${name} (coins),  X₂ = Material cost of ${name} (coins)`,50, 245);
+    const text = `μ₁ = Mean sell price of ${name} (coins),  μ₂ = Mean material cost of ${name} (coins)`;
     if(ctx.measureText(text).width > 1600) {
-        ctx.fillText(`μ₁ = Mean sell price of a ${name} (coins), \nμ₂ = Mean material cost of a ${name} (coins)`,50, 290);
+        ctx.fillText(`μ₁ = Mean sell price of ${name} (coins), \nμ₂ = Mean material cost of ${name} (coins)`,50, 290);
     } else {
         ctx.fillText(text,50, 290);
     }
@@ -58,7 +71,7 @@ function drawRequirements(ctx, data,test) {
     ctx.moveTo(50,450);
     ctx.lineTo(50+ctx.measureText(title).width,450);
     ctx.stroke();
-    ctx.fillText(`1. 2 independent SRS's: ✓ n₁ = ${data.sellPrice.length} n₂ = ${data.craftCost.length}\n    One price/cost from either group will not affect any price/cost from either group`, 50, 510);
+    ctx.fillText(`1. 2 independent SRS's: ✓ n₁ = ${data.sellPrice.length} n₂ = ${data.craftCost.length}\n     One price/cost from either group will not affect any price/cost from either group`, 50, 510);
     ctx.fillText(`2. σ is not known, but Sₓ is: ✓ S₁ = ${numberWithCommas(Math.round(test.sx(data.sellPrice)*10000)/10000)} coins S₂ = ${numberWithCommas(Math.round(test.sx(data.craftCost)*10000)/10000)} coins`, 50, 610);
     let req3 = `3. ${data.sellPrice.length <= 30?"Group1 is normally distributed":"n₁ > 30"} and n₂ > 30: ✓`
     if(data.sellPrice.length > 30) {
@@ -68,7 +81,6 @@ function drawRequirements(ctx, data,test) {
         ctx.fillText(`n₂ = ${data.craftCost.length}`, 490, 718);
     }
     ctx.fillText(req3, 50, 660);
-    
 }
 
 function drawQuantilePlot(ctx, data, dimentions) {
@@ -198,10 +210,10 @@ function drawTestStat(ctx, test) {
 
     ctx.fillText("Inputs:", 1200, 970);
     ctx.font = "27px sans-serif";
-    ctx.fillText(`x̄₁ = ${numberWithCommas(Math.round(test.mean(test.sample1)*1000)/1000)} (coins)`, 1200, 1020);
-    ctx.fillText(`x̄₂ = ${numberWithCommas(Math.round(test.mean(test.sample2)*1000)/1000)} (coins)`, 1200, 1055);
-    ctx.fillText(`S₁ = ${numberWithCommas(Math.round(test.sx(test.sample1)*1000)/1000)} (coins)`, 1200, 1090);
-    ctx.fillText(`S₂ = ${numberWithCommas(Math.round(test.sx(test.sample2)*1000)/1000)} (coins)`, 1200, 1125);
+    ctx.fillText(`x̄₁ = ${numberWithCommas(Math.round(test.mean(test.sample1)*10000)/10000)} (coins)`, 1200, 1020);
+    ctx.fillText(`x̄₂ = ${numberWithCommas(Math.round(test.mean(test.sample2)*10000)/10000)} (coins)`, 1200, 1055);
+    ctx.fillText(`S₁ = ${numberWithCommas(Math.round(test.sx(test.sample1)*10000)/10000)} (coins)`, 1200, 1090);
+    ctx.fillText(`S₂ = ${numberWithCommas(Math.round(test.sx(test.sample2)*10000)/10000)} (coins)`, 1200, 1125);
     ctx.fillText(`n₁ = ${numberWithCommas(test.sample1.length)}`, 1200, 1160);
     ctx.fillText(`n₂ = ${numberWithCommas(test.sample2.length)}`, 1200, 1195);
 }
@@ -212,10 +224,10 @@ function drawConclusion(ctx, test, itemName) {
     ctx.font = "40px sans-serif";
     if(test.rejectTest()[0]) {
         interpretation = `There is significant evidence at the α=${Math.round((1-test.significanceLevel)*1000)/1000} level of significance to support the \nclaim that the mean selling price of ${itemName} is greater than\nthe mean cost of the materials required to make it.`;
-        conclusion = `Since we rejected the Hₒ, it suggests that on average people earned more \nmoney from selling this item than it cost them to buy the materials.`;
+        conclusion = `Since we rejected Hₒ, it suggests that on average people earned more \ncoins from selling this item than it cost them to buy the materials.`;
     } else {
         interpretation = `There is not significant evidence at the α=${Math.round((1-test.significanceLevel)*1000)/1000} level of significance to support the \nclaim that the mean selling price of ${itemName} is greater than\nthe mean cost of the materials required to make it.`;
-        conclusion = `Since we failed to reject the Hₒ, it suggests that on average people did not earn more\nmoney from selling this item than it cost them to buy the materials.`;
+        conclusion = `Since we failed to reject Hₒ, it suggests that on average people did not earn more\ncoins from selling this item than it would have cost them to buy the materials.`;
     }
     ctx.fillText(interpretation, 50, 1500);
     ctx.fillText(conclusion, 50, 1750);

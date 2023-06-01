@@ -12,13 +12,14 @@ function generateInterpretation(dataset) {
     else variabilityDescription = "low";
     const variability = `It has a ${variabilityDescription} variability (IQR of ${numberWithCommas(Math.round(iqr))} coins)`
     
-    const relativeSkew = mean(dataset) / percentiles[2];
+    const relativeSkew = mean(boxplot.seperateOutliers(dataset)[0]) / percentiles[2];
     let skewDescription;
-    if(relativeSkew > 1.25) skewDescription = "skewed right";
-    else if(relativeSkew < 0.8) skewDescription = "skewed left";
+    if(relativeSkew > 1.05) skewDescription = "skewed right";
+    else if(relativeSkew < 1/1.05) skewDescription = "skewed left";
     else skewDescription = "mostly symmetrical";
+    console.log(relativeSkew);
 
-    const gaps = histogram.gapTest(dataset,25);
+    const gaps = histogram.gapTest(boxplot.seperateOutliers(dataset)[0],12);
     let gapsDescription = "There are many large gaps in the distribution";
     if(gaps.length <= 4) {
         gapsDescription = gaps.length==1?"There is a large gap between ":"There are large gaps between ";
@@ -26,6 +27,9 @@ function generateInterpretation(dataset) {
             gapsDescription += numberWithCommas(Math.round(gaps[i][0])) + " - " + numberWithCommas(Math.round(gaps[i][1])) + " coins"
             if(i<gaps.length-1) gapsDescription+= (i==gaps.length-2?(gaps.length==2?" and ":", and "):", ");
         }
+    }
+    if(gaps.length == 0) {
+        gapsDescription = "There are no large gaps in the distribution";
     }
 
     const outliers = boxplot.seperateOutliers(dataset)[1];
