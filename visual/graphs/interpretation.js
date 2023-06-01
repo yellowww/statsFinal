@@ -17,7 +17,6 @@ function generateInterpretation(dataset) {
     if(relativeSkew > 1.05) skewDescription = "skewed right";
     else if(relativeSkew < 1/1.05) skewDescription = "skewed left";
     else skewDescription = "mostly symmetrical";
-    console.log(relativeSkew);
 
     const gaps = histogram.gapTest(boxplot.seperateOutliers(dataset)[0],12);
     let gapsDescription = "There are many large gaps in the distribution";

@@ -3,7 +3,7 @@ const fs = require("fs");
 const histogram = require("./graphs/histogram.js");
 const boxplot = require("./graphs/boxplot.js");
 const interpret = require("./graphs/interpretation.js");
-
+const normality = require("./getNormality.js");
 const formated = JSON.parse(fs.readFileSync("./data/formated/formated.json"));
 const keys = Object.keys(formated);
 
@@ -25,6 +25,7 @@ function getRoundingRule(data) {
 }
 
 function generateDistributionPage(index) {
+    if(!normality.isNormal(index)) return;
     const sellPrices = formated[keys[index]].sellPrice, craftCosts = formated[keys[index]].craftCost;
     const histogramRoundingRule = getRoundingRule([...sellPrices, ...craftCosts]);
     const canvas = createCanvas(1700,2200);
@@ -70,7 +71,7 @@ function generateDistributionPage(index) {
     interpret.draw(ctx, craftCosts, [950, 960, 630,400]);
     //interpret.bigFive(craftCosts);
     const buffer = canvas.toBuffer("image/png");
-    fs.writeFileSync(`./writeUp/displays/display${0}.png`, buffer);   
+    fs.writeFileSync(`./writeUp/displays/display${normality.getIndex(index)}.png`, buffer);   
 }
 
 module.exports = generateDistributionPage;

@@ -3,11 +3,13 @@ const fs = require("fs");
 const DiffMeanTest = require("../analysis/DiffMeanTest.js");
 const tDistribution = require("../analysis/tDistribution.js");
 const boxplot = require("./graphs/boxplot.js");
+const normality = require("./getNormality.js");
 
 const formated = JSON.parse(fs.readFileSync("./data/formated/formated.json"));
 const keys = Object.keys(formated);
 
 function generateTestWriteup(index) {
+    if(!normality.isNormal(index)) return;
     const canvas = createCanvas(1700,2200);
     const ctx = canvas.getContext('2d');
     const data = formated[keys[index]];
@@ -36,7 +38,7 @@ function generateTestWriteup(index) {
     drawConclusion(ctx,test, getName(index));
     drawRejectionCritieria(ctx, data, 0.95, test, () => {
         const buffer = canvas.toBuffer("image/png");
-        fs.writeFileSync(`./writeUp/tests/test${0}.png`, buffer);   
+        fs.writeFileSync(`./writeUp/tests/test${normality.getIndex(index)}.png`, buffer);   
     });
 
 }

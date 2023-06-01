@@ -14,13 +14,13 @@
 //     const test = new DiffMeanTest(thisItem.sellPrice, thisItem.craftCost,0.95);
 //     console.log(test.rejectTest(),test.getTestStat(), keys[i]);
 // }
-
 const generateDistributions = require("./visual/generateDistributions.js");
 const testWriteup = require("./visual/testWriteup.js");
 
 
-
-
 const index = 8
-generateDistributions(index)
-testWriteup(index)
+for(let i=0;i<156;i++) {
+    generateDistributions(i)
+    //testWriteup(i)
+
+}
