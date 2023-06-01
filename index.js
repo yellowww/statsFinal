@@ -16,11 +16,15 @@
 // }
 const generateDistributions = require("./visual/generateDistributions.js");
 const testWriteup = require("./visual/testWriteup.js");
+const generatePDF = require("./visual/generatePDF.js");
 
-
-const index = 8
-for(let i=0;i<156;i++) {
-    generateDistributions(i)
-    //testWriteup(i)
-
+function generateVisuals() {
+    const index = 8
+    for(let i=0;i<156;i++) {
+        generateDistributions(i)
+        testWriteup(i)
+    }
 }
+
+generatePDF(97);
+
