@@ -226,7 +226,7 @@ function drawConclusion(ctx, test, itemName) {
     ctx.font = "40px sans-serif";
     if(test.rejectTest()[0]) {
         interpretation = `There is significant evidence at the α=${Math.round((1-test.significanceLevel)*1000)/1000} level of significance to support the \nclaim that the mean selling price of ${itemName} is greater than\nthe mean cost of the materials required to make it.`;
-        conclusion = `Since we rejected Hₒ, it suggests that on average people earned more \ncoins from selling this item than it cost them to buy the materials.`;
+        conclusion = `Since we rejected Hₒ, it suggests that on average people earned more \ncoins from selling this item than it would have cost them to buy the materials.`;
     } else {
         interpretation = `There is not significant evidence at the α=${Math.round((1-test.significanceLevel)*1000)/1000} level of significance to support the \nclaim that the mean selling price of ${itemName} is greater than\nthe mean cost of the materials required to make it.`;
         conclusion = `Since we failed to reject Hₒ, it suggests that on average people did not earn more\ncoins from selling this item than it would have cost them to buy the materials.`;
