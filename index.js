@@ -26,5 +26,6 @@ function generateVisuals() {
     }
 }
 
+//generateVisuals();
 generatePDF(97);
 

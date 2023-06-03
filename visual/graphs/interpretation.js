@@ -1,7 +1,8 @@
 const boxplot = require('./boxplot.js');
 const histogram = require('./histogram.js');
 
-function generateInterpretation(dataset) {
+function generateInterpretation(rawDataset) {
+    dataset = boxplot.seperateOutliers(rawDataset)[0];
     const percentiles = [boxplot.fromPercentiles(dataset, 0), boxplot.fromPercentiles(dataset, 0.25), boxplot.fromPercentiles(dataset, 0.5), boxplot.fromPercentiles(dataset, 0.75), boxplot.fromPercentiles(dataset,1)];
     const iqr = percentiles[3] - percentiles[1];
     const center = `The distribution is centered around ${numberWithCommas(Math.round(percentiles[2]))} coins (median).`;
@@ -12,13 +13,13 @@ function generateInterpretation(dataset) {
     else variabilityDescription = "low";
     const variability = `It has a ${variabilityDescription} variability (IQR of ${numberWithCommas(Math.round(iqr))} coins)`
     
-    const relativeSkew = mean(boxplot.seperateOutliers(dataset)[0]) / percentiles[2];
+    const relativeSkew = mean(dataset) / percentiles[2];
     let skewDescription;
     if(relativeSkew > 1.05) skewDescription = "skewed right";
     else if(relativeSkew < 1/1.05) skewDescription = "skewed left";
     else skewDescription = "mostly symmetrical";
 
-    const gaps = histogram.gapTest(boxplot.seperateOutliers(dataset)[0],12);
+    const gaps = histogram.gapTest(dataset,12);
     let gapsDescription = "There are many large gaps in the distribution";
     if(gaps.length <= 4) {
         gapsDescription = gaps.length==1?"There is a large gap between ":"There are large gaps between ";
@@ -31,7 +32,7 @@ function generateInterpretation(dataset) {
         gapsDescription = "There are no large gaps in the distribution";
     }
 
-    const outliers = boxplot.seperateOutliers(dataset)[1];
+    const outliers = boxplot.seperateOutliers(rawDataset)[1];
     const lowOutliers = [], highOutliers = [];
     for(let i=0;i<outliers.length;i++) {
         if(outliers[i]<percentiles[2]) lowOutliers.push(outliers[i]);

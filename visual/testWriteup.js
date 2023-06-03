@@ -80,7 +80,7 @@ function drawRequirements(ctx, data,test) {
         req3 += ` n₁ = ${data.sellPrice.length} > 30  n₂ = ${data.craftCost.length} > 30`
     } else {
         drawQuantilePlot(ctx, data.sellPrice, [90, 750, 350, 150]);
-        ctx.fillText(`n₂ = ${data.craftCost.length}`, 490, 718);
+        ctx.fillText(`n₂ = ${data.craftCost.length} > 30`, 490, 718);
     }
     ctx.fillText(req3, 50, 660);
 }
