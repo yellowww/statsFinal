@@ -65,7 +65,7 @@ function drawLetStatments(ctx, name) {
 function drawRequirements(ctx, data,test) {
     ctx.font = `40px sans-serif`;
     ctx.fillStyle = "black";
-    const title = "Requirements for a difference of means test (σ unknown):"
+    const title = "Requirements for a difference of means test (σ₁ and σ₂ unknown):"
     ctx.fillText(title, 50, 450);
     ctx.beginPath();
     ctx.strokeStyle = "black";
@@ -108,7 +108,7 @@ function drawQuantilePlot(ctx, data, dimentions) {
     ctx.strokeWidth = 4;
     ctx.beginPath();
     let xAxis = ((0 - minX)/xRange);
-    if(xAxis < 0) xAxis = 0;
+    if(xAxis < 0) xAxis = -300;
     ctx.moveTo(xAxis * dimentions[2] + dimentions[0], dimentions[1]);
     ctx.lineTo(xAxis * dimentions[2] + dimentions[0], dimentions[1]+dimentions[3]);
 
@@ -227,12 +227,16 @@ function drawConclusion(ctx, test, itemName) {
     if(test.rejectTest()[0]) {
         interpretation = `There is significant evidence at the α=${Math.round((1-test.significanceLevel)*1000)/1000} level of significance to support the \nclaim that the mean selling price of ${itemName} is greater than\nthe mean cost of the materials required to make it.`;
         conclusion = `Since we rejected Hₒ, it suggests that on average people earned more \ncoins from selling this item than it would have cost them to buy the materials.`;
+        ctx.fillText(`Implication: the test suggests that on average we could make a profit from \nflipping this item.`, 50, 1900);
     } else {
         interpretation = `There is not significant evidence at the α=${Math.round((1-test.significanceLevel)*1000)/1000} level of significance to support the \nclaim that the mean selling price of ${itemName} is greater than\nthe mean cost of the materials required to make it.`;
         conclusion = `Since we failed to reject Hₒ, it suggests that on average people did not earn more\ncoins from selling this item than it would have cost them to buy the materials.`;
+        ctx.fillText(`Implication: the test does not suggest that on average we could make a profit from \nflipping this item.`, 50, 1900);
     }
     ctx.fillText(interpretation, 50, 1500);
     ctx.fillText(conclusion, 50, 1750);
+
+    
 }
 
 function numberWithCommas(x) {

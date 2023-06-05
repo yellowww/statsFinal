@@ -27,5 +27,5 @@ function generateVisuals() {
 }
 
 //generateVisuals();
-generatePDF(97);
-
+generatePDF.extended(97, 'writeUp');
+generatePDF.brief('writeUpBrief');

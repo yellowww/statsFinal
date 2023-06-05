@@ -107,7 +107,7 @@ function generateHistogram(ctx, dataset, bars, dimentions, roundingRule, title, 
         const text = `${numberWithCommas(Math.round(barBounteries[i][0]/roundingRule[0])+(i==0?0:1))} - ${numberWithCommas(Math.round(barBounteries[i][1]/roundingRule[0]))}`;
         ctx.fillText(text, 0, 0);
         ctx.restore();
-        if(i==Math.ceil(bars/2)) maxPriceLength = ctx.measureText(text).width;
+        if(bars == 1 || i==Math.ceil(bars/2))maxPriceLength = ctx.measureText(text).width;
     }
 
     // x axis label
